@@ -10,7 +10,7 @@ export function App() {
   const [algorithm, setAlgorithm] = useState(AlgorithmType.bogo);
 
   const [arr, setArr] = useState<number[]>([]);
-  const [length, setLength] = useState<number>(50);
+  const [length, setLength] = useState<number>(0);
 
   const diagnosticRef = useRef<Diagnostic>(new Diagnostic());
   const speedRef = useRef<number>(10);
@@ -33,6 +33,7 @@ export function App() {
     stopReconstruction();
     const newArr = shuffle(arr);
     setArr(newArr);
+    diagnosticRef.current = runDiagnostic(newArr, algorithm.func);
   }
 
   const sortArray = async () => {
@@ -76,7 +77,10 @@ export function App() {
         </button>
         <button 
           id='new-button'
-          onClick={() => populateArray(length, setArr)}
+          onClick={() => {
+            const newArr = populateArray(length, setArr);
+            diagnosticRef.current = runDiagnostic(newArr, algorithm.func);
+          }}
         >
           New
         </button>
@@ -100,7 +104,7 @@ export function App() {
         <input 
           type="number" 
           id="length-input" 
-          min="10" max="1000" 
+          min="0" max="1000" 
           value={length} onChange={handleLengthChange}
         />
       </span>
