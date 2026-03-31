@@ -1,7 +1,7 @@
 import { isSorted, shuffle, runDiagnostic, type Diagnostic } from "../src/Sorter.ts";
 import type { Step } from "./Step.ts";
 
-const MAX : number = 99999;
+const MAX : number = 9999;
 
 export class Algorithm {
     public name: string
@@ -25,10 +25,10 @@ export class Algorithm {
     }
 }
 
-export const Type = {
+export const AlgorithmType = {
     bogo: new Algorithm(
         "Bogo",
-        "bogosort (also known as permutation sort and stupid sort) is a sorting algorithm based on the generate and test paradigm. The function successively generates permutations of its input until it finds one that is sorted.",
+        "bogosort is a sorting algorithm based on the generate and test paradigm. The function successively generates permutations of its input until it finds one that is sorted.",
         "1",
         "n * n!",
         (arr: Array<number>, recordCallback: (moving: number, moveTo: number) => void) => {
@@ -45,14 +45,47 @@ export const Type = {
             return sorted;
         }
     ),
+    bubble: new Algorithm(
+        "Bubble",
+        "Bubble sort is a simple sorting algorithm that repeatedly steps through the list, compares adjacent elements and swaps them if they are in the wrong order. The pass through the list is repeated until the list is sorted.",
+        "1",
+        "n^2",
+        (arr: Array<number>, recordCallback: (moving: number, moveTo: number) => void) => {
+            let sorted = [...arr];
+            let n = sorted.length;
+
+            for (let i = 0; i < n - 1; i++) {
+                for (let j = 0; j < n - i - 1; j++) {
+                    if (sorted[j] > sorted[j + 1]) {
+                        // Swap
+                        [sorted[j], sorted[j + 1]] = [sorted[j + 1], sorted[j]];
+                        recordCallback(j, j + 1);
+                    }
+                }
+            }
+
+            return sorted;
+        }
+    )
 
 }
 
-// can maybe make process an object again so I can store current step idx and complete time for diagnostics, but for now this is fine.
-export type Process = Array<Step>;
+export class Process {
+    public steps: Array<Step>;
+    public done: Array<Step>;
+    public start: Array<number>;
+    
+    constructor(steps: Array<Step> = [], start: Array<number> = []){
+        this.steps = steps;
+        this.done = [];
+        this.start = start;
+    }
+}
 
 export function runDemo() {
   const arr: Array<number> = [3, 1, 6, 7, 2, 9];
-  const dia: Diagnostic = runDiagnostic(arr, Type.bogo.func);
+  const dia: Diagnostic = runDiagnostic(arr, AlgorithmType.bogo.func);
   console.log(dia);
 }
+
+export default AlgorithmType;

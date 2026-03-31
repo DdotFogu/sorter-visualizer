@@ -1,0 +1,39 @@
+#button-row {
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    padding: 10px;
+
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+}
+
+#shuffle-button {
+    padding: 8px;
+    color: white;
+    background-color: red;
+    border: 0px;
+}
+
+#sort-button {
+    padding: 8px;
+    color: white;
+    background-color: green;
+    border: 0px;
+}
+
+#new-button {
+    padding: 8px;
+    color: white;
+    background-color: blue;
+    border: 0px;
+}
+
+#step-button {
+    padding: 8px;
+    color: white;
+    background-color: var(--panel-color);
+    border: 0px;
+    
+}

@@ -1,0 +1,20 @@
+.visualizer-display {
+    width: 100%;
+    height: 100%;
+    
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: end;
+    gap: 1px;
+}
+
+.array-element {
+    width: 100%;
+    height: 100%;
+    display: flex;
+
+    background-color: var(--array-element-color);
+    border-top-left-radius: 1px;
+    border-top-right-radius: 1px;
+}

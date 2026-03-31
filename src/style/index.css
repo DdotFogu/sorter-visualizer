@@ -1,0 +1,19 @@
+:root {
+  --background-color: #030503;
+  --panel-color: #0A0A0A;
+  --array-element-color: #FFFFFF;
+
+  --panel-border-radius: 8px;
+}
+
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--background-color);
+}
+

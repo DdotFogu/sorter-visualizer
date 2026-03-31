@@ -1,5 +1,7 @@
-import { type Process } from "./Algorithm";
+import { Process } from "./Algorithm";
 import { type Step } from "./Step";
+
+export let stop: boolean = false;
 
 export class Diagnostic {
     public process: Process;
@@ -7,7 +9,7 @@ export class Diagnostic {
     public success: boolean;
 
     constructor(
-        process: Process = [],
+        process: Process = new Process(),
         result: Array<number> = [],
     ){
         this.process = process;
@@ -29,29 +31,30 @@ export const isSorted = (arr: Array<number>): boolean => {
     return true;
 }
 
-export const shuffle = (array: Array<number>, recordCallback: (moving: number, moveTo: number) => void) => {
-  let currentIndex = array.length, randomIndex;
-  while (currentIndex !== 0) {
-    randomIndex = Math.floor(Math.random() * currentIndex);
-    currentIndex--;
-    
-    if (recordCallback) recordCallback(currentIndex, randomIndex);
-    [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
-  }
-  
-  return array;
+export const shuffle = (array: Array<number>, recordCallback: (moving: number, moveTo: number) => void = () => {}) => {
+    const a = [...array];
+    let currentIndex = a.length, randomIndex;
+    while (currentIndex !== 0) {
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+
+        if (recordCallback) recordCallback(currentIndex, randomIndex);
+        [a[currentIndex], a[randomIndex]] = [a[randomIndex], a[currentIndex]];
+    }
+
+    return a;
 }
 
 const getProcess = (array: Array<number>, fc: Function =()=>{}): Process => {
-    const steps: Process = [];
+    const process: Process = new Process([], array);
 
     const record = (moving: number, moveTo: number) => {
-        steps.push({ moving, moveTo });
+        process.steps.push({ moving, moveTo });
     };
 
     fc(array, record);
 
-    return steps;
+    return process;
 }
 
 export const stepArray = (arr: Array<number>, step: Step): Array<number> => {
@@ -62,19 +65,55 @@ export const stepArray = (arr: Array<number>, step: Step): Array<number> => {
     return steppedArray;
 }
 
-const reconstructFromProcess = (array: Array<number>, process: Process): Array<number> => {
-    for (let step of process) {
+export const reconstructFromProcessSync = (array: Array<number>, process: Process): Array<number> => {
+    for (let step of process.steps) {
         array = stepArray(array, step);
     }
 
     return array;
 }
 
+export const reconstructFromProcess = async (
+    array: Array<number>,
+    process: Process,
+    setArr: React.Dispatch<React.SetStateAction<number[]>> = () => {},
+    speed: number = 10
+): Promise<Array<number>> => {
+    stop = false;
+
+    while (process.steps.length > 0) {
+        if (stop) { stop = false; break; };
+
+        const step = process.steps.shift() as Step;
+        process.done.push(step);
+        console.log(process.done);
+
+        array = stepArray(array, step);
+
+        setArr(array);
+
+        await new Promise(resolve => setTimeout(resolve, speed));
+    }
+
+    return array;
+}
+
+export const stopReconstruction = () => { stop = true; }
+
 export const runDiagnostic = (array: Array<number>, fc: Function =()=>{}): Diagnostic => {
+    const process = getProcess(array, fc);
     const diagnostic = new Diagnostic(
-        getProcess(array, fc),
-        reconstructFromProcess(array, getProcess(array, fc))
+        process,
+        reconstructFromProcessSync(array, process)
     );
 
     return diagnostic;
 }
+
+export const populateArray = (length: number, setArr: React.Dispatch<React.SetStateAction<number[]>>) => {
+    stopReconstruction();
+    
+    const newArr = Array.from({ length: length }, () => Math.random());
+    setArr(newArr);
+    return newArr;
+};
