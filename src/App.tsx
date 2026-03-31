@@ -11,7 +11,7 @@ export function App() {
   const [algorithm, setAlgorithm] = useState(AlgorithmType.quick);
 
   const [arr, setArr] = useState<number[]>([]);
-  const [length, setLength] = useState<number>(250);
+  const [length] = useState<number>(250);
   const [refreshTrigger, setRefreshTrigger] = useState<number>(0);
 
   const diagnosticRef = useRef<Diagnostic>(new Diagnostic());
