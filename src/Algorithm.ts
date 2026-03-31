@@ -291,7 +291,7 @@ export const AlgorithmType = {
     }
     ),
     cocktail: new Algorithm(
-    "Cocktail Shaker",
+    "Cocktail",
     "Cocktail shaker sort is a bidirectional bubble sort. It alternates between bubbling the largest element to the right and the smallest element to the left, like liquid sloshing back and forth in a shaker.",
     "1",
     "n^2",
@@ -399,6 +399,10 @@ export class Process {
         this.steps = steps;
         this.done = [];
         this.start = start;
+    }
+
+    getTotalSteps(): number {
+        return this.steps.length + this.done.length;
     }
 }
 

@@ -5,12 +5,14 @@ import { useEffect, useRef, useState } from 'react';
 import { populateArray, shuffle, runDiagnostic, reconstructFromProcess, stopReconstruction, Diagnostic, stepArray } from './Sorter';
 import { AlgorithmType } from './Algorithm';
 import type { Step } from './Step';
+import AlgorithmInfo from './components/AlgorithmInfo';
 
 export function App() {
-  const [algorithm, setAlgorithm] = useState(AlgorithmType.bogo);
+  const [algorithm, setAlgorithm] = useState(AlgorithmType.quick);
 
   const [arr, setArr] = useState<number[]>([]);
-  const [length, setLength] = useState<number>(0);
+  const [length, setLength] = useState<number>(250);
+  const [refreshTrigger, setRefreshTrigger] = useState<number>(0);
 
   const diagnosticRef = useRef<Diagnostic>(new Diagnostic());
   const speedRef = useRef<number>(10);
@@ -19,15 +21,6 @@ export function App() {
     const newArr = populateArray(length, setArr);
     diagnosticRef.current = runDiagnostic(newArr, algorithm.func);
   }, [length, algorithm]);
-
-  const handleLengthChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newLength = parseInt(e.target.value);
-    if (!isNaN(newLength) && newLength > 0) {
-      stopReconstruction();
-      setLength(newLength);
-      populateArray(newLength, setArr);
-    }
-  }
 
   const suffleArray = () => {
     stopReconstruction();
@@ -40,6 +33,7 @@ export function App() {
     stopReconstruction();
     
     await reconstructFromProcess(arr, diagnosticRef.current.process, setArr, speedRef.current);
+    setRefreshTrigger(prev => prev + 1);
   }
 
   const stepForward = async () => {
@@ -49,6 +43,7 @@ export function App() {
     diagnosticRef.current.process.done.push(step);
     
     setArr(stepArray(arr, step));
+    setRefreshTrigger(prev => prev + 1);
   }
 
   const stepBackward = async () => {
@@ -57,11 +52,13 @@ export function App() {
     if (!step) return;
     diagnosticRef.current.process.steps.unshift(step);
     setArr(stepArray(arr, {moveTo: step.moving, moving: step.moveTo}));
+    setRefreshTrigger(prev => prev + 1);
   }
 
   return (
     <>
-      <Visualizer elements={arr}/>
+      <AlgorithmInfo algorithm={algorithm} diagnostic={diagnosticRef.current}/>
+      <Visualizer elements={arr} process={diagnosticRef.current.process} key={refreshTrigger}/>
       <span id='button-row'>
         <button 
           id='sort-button'
@@ -101,12 +98,14 @@ export function App() {
             <option value={key} key={key}>{AlgorithmType[key as keyof typeof AlgorithmType].name}</option>
           ))}
         </select>
-        <input 
-          type="number" 
-          id="length-input" 
-          min="0" max="1000" 
-          value={length} onChange={handleLengthChange}
-        />
+        {/*
+          <input 
+            type="number" 
+            id="length-input" 
+            min="0" max="1000" 
+            value={length} onChange={handleLengthChange}
+          />
+        */}
       </span>
     </>
   )

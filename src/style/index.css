@@ -1,6 +1,6 @@
 :root {
   --background-color: #030503;
-  --panel-color: #0A0A0A;
+  --panel-color: #1a1a1a;
   --array-element-color: #FFFFFF;
 
   --panel-border-radius: 8px;
@@ -15,5 +15,6 @@ html, body, #root {
   align-items: center;
   justify-content: center;
   background-color: var(--background-color);
+  overflow: hidden;
 }
 
